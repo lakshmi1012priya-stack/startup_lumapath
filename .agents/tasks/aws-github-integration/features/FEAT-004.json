@@ -1,0 +1,25 @@
+{
+  "id": "FEAT-004",
+  "type": "docs",
+  "description": "Create GitHub Actions workflow (.github/workflows/deploy.yml), AWS setup documentation (docs/aws-setup.md), and architecture diagram (docs/aws-architecture.md). This FEAT is independent of FEAT-002 and FEAT-003 — it only references file paths, not code — but should run last so the final build validation in deploy.yml reflects the complete project.",
+  "status": "completed",
+  "steps": [
+    "Step 1 — Create directory c:\\Users\\laksh\\OneDrive\\Attachments\\Desktop\\LumaPath\\.github\\workflows\\ and file deploy.yml. Trigger: on push and pull_request targeting main branch. Job 1 name: lint-and-build, runs-on: ubuntu-latest. Steps: checkout (actions/checkout@v4), setup-node v20 with npm cache (actions/setup-node@v4 with node-version: '20' and cache: 'npm'), run npm ci, run npm run lint, run npm run build. Add env block to the build step with: AWS_REGION: ap-south-1, DYNAMODB_TABLE_NAME: MoiSubmissions, S3_BUCKET_NAME: lumapath-receipts, ADMIN_SECRET: ci-placeholder, NEXTAUTH_SECRET: ci-placeholder. Job 2 name: deploy, needs: lint-and-build, runs-on: ubuntu-latest, condition: github.event_name == 'push' && github.ref == 'refs/heads/main'. Steps: checkout (actions/checkout@v4), install Vercel CLI (npm install --global vercel@latest), pull Vercel env (vercel pull --yes --environment=production --token=${{ secrets.VERCEL_TOKEN }}), build (vercel build --prod --token=${{ secrets.VERCEL_TOKEN }}), deploy (vercel deploy --prebuilt --prod --token=${{ secrets.VERCEL_TOKEN }}).",
+
+    "Step 2 — Create c:\\Users\\laksh\\OneDrive\\Attachments\\Desktop\\LumaPath\\docs\\ directory and file aws-setup.md. Write step-by-step instructions covering: (a) Create DynamoDB table 'MoiSubmissions' in ap-south-1: partition key transactionId (String), sort key timestamp (String), add GSI named 'allocation-index' with partition key allocation (String); (b) Create S3 bucket 'lumapath-receipts' in ap-south-1: block public access ON, add bucket policy allowing only the IAM user; (c) SES: verify domain lumapath.com (add DNS TXT/CNAME records), verify email noreply@lumapath.com, request production access (sandbox exit) via AWS support; (d) IAM: create user 'lumapath-app', attach inline policy granting dynamodb:PutItem, dynamodb:GetItem, dynamodb:Scan, dynamodb:Query on the MoiSubmissions table ARN, s3:PutObject on the receipts bucket, ses:SendEmail — generate Access Key and Secret; (e) Vercel env vars: add all 10 vars from .env.local.example in Vercel dashboard under Settings > Environment Variables for Production; (f) GitHub Secrets: add VERCEL_TOKEN in repo Settings > Secrets.",
+
+    "Step 3 — Create c:\\Users\\laksh\\OneDrive\\Attachments\\Desktop\\LumaPath\\docs\\aws-architecture.md. Write an ASCII architecture diagram showing the data flow: Browser → Vercel Edge (middleware.ts auth check) → Next.js API Routes → DynamoDB (MoiSubmissions table) for reads/writes, → S3 (lumapath-receipts) for receipt PNG storage, → SES (noreply@lumapath.com) for email dispatch. Include a section describing each component: Vercel (hosting + edge middleware), DynamoDB (single-table design, GSI on allocation), S3 (receipt PNG archive), SES (transactional email), GitHub Actions (CI lint+build then Vercel deploy). Include a note that the app degrades gracefully to localStorage when AWS credentials are absent."
+  ],
+  "acceptance_criteria": [
+    ".github/workflows/deploy.yml exists with lint-and-build and deploy jobs, correct triggers, and CI env vars for the build step",
+    "docs/aws-setup.md exists with DynamoDB, S3, SES, IAM, and Vercel setup instructions",
+    "docs/aws-architecture.md exists with ASCII diagram and component descriptions",
+    "npm run build still exits 0 (no changes to source code in this FEAT)"
+  ],
+  "verification": [
+    "Run `npm run build` from c:\\Users\\laksh\\OneDrive\\Attachments\\Desktop\\LumaPath — must exit 0",
+    "Confirm .github/workflows/deploy.yml is valid YAML: `npx js-yaml .github/workflows/deploy.yml` exits 0"
+  ],
+  "blocked_reason": null,
+  "findings": "All three files created successfully. .github/workflows/deploy.yml validated with npx js-yaml (exit 0). npm run build exits 0 with no TypeScript or ESLint errors. No source code changes were required — this FEAT is docs/CI only."
+}
