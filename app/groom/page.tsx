@@ -1,6 +1,7 @@
 'use client';
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
 
@@ -19,14 +20,32 @@ interface Submission {
 type TabFilter = 'All' | 'Groom Only' | 'Shared';
 
 export default function GroomPage() {
+  const router = useRouter();
   const [submissions, setSubmissions] = useState<Submission[]>([]);
   const [search, setSearch] = useState('');
   const [tab, setTab] = useState<TabFilter>('All');
 
   useEffect(() => {
-    const data: Submission[] = JSON.parse(localStorage.getItem('moi_submissions') ?? '[]');
-    setSubmissions(data);
-  }, []);
+    const load = async () => {
+      try {
+        const res = await fetch('/api/submissions');
+        if (res.status === 401) {
+          router.push('/login');
+          return;
+        }
+        if (res.ok) {
+          const data: Submission[] = await res.json();
+          setSubmissions(data);
+          return;
+        }
+      } catch {
+        // Network error — fall back to localStorage
+      }
+      const data: Submission[] = JSON.parse(localStorage.getItem('moi_submissions') ?? '[]');
+      setSubmissions(data);
+    };
+    load();
+  }, [router]);
 
   // Groom-relevant: Groom or Both
   const groomRelevant = submissions.filter(

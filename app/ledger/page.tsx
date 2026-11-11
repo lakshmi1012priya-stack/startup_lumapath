@@ -1,6 +1,7 @@
 'use client';
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
 
@@ -19,14 +20,32 @@ interface Submission {
 type TabFilter = 'All Gifts' | 'Bride Only' | 'Groom Only';
 
 export default function LedgerPage() {
+  const router = useRouter();
   const [submissions, setSubmissions] = useState<Submission[]>([]);
   const [search, setSearch] = useState('');
   const [tab, setTab] = useState<TabFilter>('All Gifts');
 
   useEffect(() => {
-    const data: Submission[] = JSON.parse(localStorage.getItem('moi_submissions') ?? '[]');
-    setSubmissions(data);
-  }, []);
+    const load = async () => {
+      try {
+        const res = await fetch('/api/submissions');
+        if (res.status === 401) {
+          router.push('/login');
+          return;
+        }
+        if (res.ok) {
+          const data: Submission[] = await res.json();
+          setSubmissions(data);
+          return;
+        }
+      } catch {
+        // Network error — fall back to localStorage
+      }
+      const data: Submission[] = JSON.parse(localStorage.getItem('moi_submissions') ?? '[]');
+      setSubmissions(data);
+    };
+    load();
+  }, [router]);
 
   const totalCollected = submissions.reduce((acc, s) => acc + s.amount, 0);
   const totalGuests = submissions.length;
@@ -47,7 +66,26 @@ export default function LedgerPage() {
 
   const displayTotal = filtered.reduce((acc, s) => acc + s.amount, 0);
 
-  const handleExportCSV = () => {
+  const handleExportCSV = async () => {
+    const filename = `master-ledger-${Date.now()}.csv`;
+
+    try {
+      const res = await fetch('/api/export');
+      if (res.ok) {
+        const blob = await res.blob();
+        const url = URL.createObjectURL(blob);
+        const link = document.createElement('a');
+        link.href = url;
+        link.download = filename;
+        link.click();
+        URL.revokeObjectURL(url);
+        return;
+      }
+    } catch {
+      // Network error — fall back to client-side CSV build
+    }
+
+    // Client-side CSV fallback
     const headers = ['#', 'Transaction ID', 'Guest Name', 'Village/Address', 'Phone', 'Amount (INR)', 'Gift For', 'Payment Mode', 'Date'];
     const rows = filtered.map((s, i) => [
       i + 1,
@@ -66,7 +104,7 @@ export default function LedgerPage() {
     const url = URL.createObjectURL(blob);
     const link = document.createElement('a');
     link.href = url;
-    link.download = `master-ledger-${Date.now()}.csv`;
+    link.download = filename;
     link.click();
     URL.revokeObjectURL(url);
   };

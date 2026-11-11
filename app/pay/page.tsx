@@ -30,7 +30,7 @@ export default function PayPage() {
   const [submitting, setSubmitting] = useState(false);
   const [currentSubmission, setCurrentSubmission] = useState<Submission | null>(null);
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!name.trim() || !address.trim() || !phone.trim() || !amountStr.trim()) {
       alert('Please fill in all fields.');
@@ -44,24 +44,49 @@ export default function PayPage() {
 
     setSubmitting(true);
 
-    // Generate transaction ID
-    const counter = parseInt(localStorage.getItem('moi_tx_counter') ?? '100001', 10);
-    const transactionId = `MOI-${counter.toString().padStart(6, '0')}`;
-    localStorage.setItem('moi_tx_counter', (counter + 1).toString());
+    let submission: Submission | null = null;
 
-    const submission: Submission = {
-      transactionId,
-      name: name.trim(),
-      address: address.trim(),
-      phone: `+91 ${phone.trim()}`,
-      amount,
-      allocation,
-      paymentMode,
-      timestamp: new Date().toISOString(),
-      event: 'Suresh & Priya Wedding | Raja Mahal, Chennai',
-    };
+    try {
+      const res = await fetch('/api/submissions', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          name: name.trim(),
+          address: address.trim(),
+          phone: phone.trim(),
+          amount,
+          allocation,
+          paymentMode,
+        }),
+      });
 
-    // Save to localStorage
+      if (res.status === 201) {
+        submission = (await res.json()) as Submission;
+      }
+    } catch {
+      // Network error — fall through to localStorage fallback
+    }
+
+    if (!submission) {
+      // localStorage fallback
+      const counter = parseInt(localStorage.getItem('moi_tx_counter') ?? '100001', 10);
+      const transactionId = `MOI-${counter.toString().padStart(6, '0')}`;
+      localStorage.setItem('moi_tx_counter', (counter + 1).toString());
+
+      submission = {
+        transactionId,
+        name: name.trim(),
+        address: address.trim(),
+        phone: `+91 ${phone.trim()}`,
+        amount,
+        allocation,
+        paymentMode,
+        timestamp: new Date().toISOString(),
+        event: 'Suresh & Priya Wedding | Raja Mahal, Chennai',
+      };
+    }
+
+    // Always persist to localStorage as offline fallback
     const existing: Submission[] = JSON.parse(localStorage.getItem('moi_submissions') ?? '[]');
     existing.push(submission);
     localStorage.setItem('moi_submissions', JSON.stringify(existing));
