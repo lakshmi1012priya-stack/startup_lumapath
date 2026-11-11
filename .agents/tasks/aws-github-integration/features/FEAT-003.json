@@ -1,0 +1,30 @@
+{
+  "id": "FEAT-003",
+  "type": "feat",
+  "description": "Create the login page (app/login/page.tsx) and update the four existing frontend pages (pay, bride, groom, ledger) to call API routes with localStorage fallback. Depends on FEAT-001 (lib types) and FEAT-002 (API routes exist). These are independent of each other within this FEAT and can be written in any order.",
+  "status": "completed",
+  "steps": [
+    "Step 1 — Create c:\\Users\\laksh\\OneDrive\\Attachments\\Desktop\\LumaPath\\app\\login\\page.tsx. This is a 'use client' page. Dark slate-900 background, centered card, LumaPath logo at top (same markup as Navbar logo: violet-600 'L' square, 'LumaPath' bold, 'Digital Moi Express' subtext in violet-400). Password input (type=password, placeholder='Admin password', slate-900 bg, violet-500 focus border). 'Access Dashboard' submit button (violet-600, full width). On submit: setLoading(true), POST to /api/auth/login with body { password }, on success (status 200) redirect to /ledger using router.push('/ledger'), on error show inline red error message 'Incorrect password. Please try again.' setLoading(false). Include a 'Back to Home' link in slate-400. Must NOT import anything from lib/ — it only calls the API route.",
+
+    "Step 2 — Update c:\\Users\\laksh\\OneDrive\\Attachments\\Desktop\\LumaPath\\app\\pay\\page.tsx. The handleSubmit function should become async. Add a loading state (already exists as 'submitting'). New flow: (a) Try POST /api/submissions with body { name, address, phone, amount, allocation, paymentMode }. (b) On success (status 201) use the submission from response.json(). (c) On network error or non-201 response: fall back to the existing localStorage logic (generate transactionId from counter, build submission object, push to moi_submissions). Ensure localStorage is always written as fallback. Add a loading spinner indicator during the API call — the existing disabled button text '⏳ Processing...' already shows this. Keep all existing UI exactly as-is; only change handleSubmit internals.",
+
+    "Step 3 — Update c:\\Users\\laksh\\OneDrive\\Attachments\\Desktop\\LumaPath\\app\\bride\\page.tsx. In useEffect, replace direct localStorage read with: try fetching GET /api/submissions, on 401 response call router.push('/login') (import useRouter from 'next/navigation'), on 200 setSubmissions(data). Catch any network error and fall back to localStorage.getItem('moi_submissions'). Keep all existing UI and filtering/sorting logic exactly as-is.",
+
+    "Step 4 — Update c:\\Users\\laksh\\OneDrive\\Attachments\\Desktop\\LumaPath\\app\\groom\\page.tsx. Same pattern as Step 3: useEffect fetches GET /api/submissions, 401 → router.push('/login'), 200 → setSubmissions(data), network error → localStorage fallback. Keep all existing UI.",
+
+    "Step 5 — Update c:\\Users\\laksh\\OneDrive\\Attachments\\Desktop\\LumaPath\\app\\ledger\\page.tsx. Same fetch pattern in useEffect as bride/groom. Additionally update handleExportCSV: replace the client-side CSV build logic with a fetch to GET /api/export — on success, receive blob, create object URL, trigger download with same filename pattern. On network error fall back to the existing client-side CSV build. Keep all existing UI."
+  ],
+  "acceptance_criteria": [
+    "app/login/page.tsx exists, renders with LumaPath branding, posts to /api/auth/login, redirects to /ledger on success",
+    "app/pay/page.tsx handleSubmit posts to /api/submissions first, falls back to localStorage on failure",
+    "app/bride/page.tsx and app/groom/page.tsx fetch from /api/submissions, fall back to localStorage, redirect to /login on 401",
+    "app/ledger/page.tsx fetches from /api/submissions and export button calls /api/export, both with fallbacks",
+    "All pages compile cleanly — npm run build exits 0"
+  ],
+  "verification": [
+    "Run `npm run lint` from c:\\Users\\laksh\\OneDrive\\Attachments\\Desktop\\LumaPath — must exit 0",
+    "Run `npm run build` from c:\\Users\\laksh\\OneDrive\\Attachments\\Desktop\\LumaPath — must exit 0"
+  ],
+  "blocked_reason": null,
+  "findings": "All 5 steps implemented and verified. app/login/page.tsx created with LumaPath branding (logo matches Navbar markup), password POST to /api/auth/login, redirect to /ledger on 200, inline red error on failure, no lib/ imports. app/pay/page.tsx handleSubmit made async: tries POST /api/submissions first (status 201), falls back to localStorage counter+object on failure, always writes to localStorage. app/bride/page.tsx and app/groom/page.tsx: useRouter imported, useEffect replaced with async load() — GET /api/submissions, 401 → router.push('/login'), 200 → setSubmissions(data), network error → localStorage fallback. app/ledger/page.tsx: same fetch pattern in useEffect; handleExportCSV made async — tries GET /api/export blob download first, falls back to client-side CSV build on network error. Build target: .next cache was stale (EINVAL readlink on Windows), cleared with Remove-Item and rebuilt cleanly. npm run lint: 0 errors. npm run build: exit 0, all 13 routes compiled."
+}
