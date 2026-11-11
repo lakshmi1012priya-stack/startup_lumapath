@@ -1,0 +1,28 @@
+{
+  "project_type": "Next.js 14 App Router + TypeScript, single-package, deployed to Vercel",
+  "language": "TypeScript (strict mode, isolatedModules, moduleResolution: bundler)",
+  "build_system": "Next.js 14.2.5 — no custom webpack config. next.config.js is essentially empty. Path alias @/* maps to project root.",
+  "test_framework": "none — no test runner configured. Verification = npm run lint + npm run build",
+  "build_command": "npm run build",
+  "test_command": "npm run lint",
+  "verification_instructions": "Run `npm run lint` (must exit 0, no ESLint errors). Then run `npm run build` (must exit 0, no TypeScript or Next.js compile errors). Both commands run from the project root c:\\Users\\laksh\\OneDrive\\Attachments\\Desktop\\LumaPath.",
+  "snapshot_or_generated_files": "null",
+  "environment_constraints": "Windows/PowerShell workspace. Use semicolons (;) to chain shell commands, not &&. Never restart a dev server. AWS SDK packages must be pinned to exact versions as specified in task. All AWS calls must gracefully handle missing env vars (return null / no-op) so CI build succeeds without real credentials.",
+  "contribution_requirements": "No AGENTS.md or CONTRIBUTING.md exists. Follow existing patterns: 'use client' directive on all interactive pages, Tailwind utility classes (slate/violet/emerald palette), TypeScript strict types, no test files needed.",
+  "key_patterns": "1) All pages are 'use client' with useEffect for data loading, useState for local state. Submission shape: { transactionId, name, address, phone, amount, allocation, paymentMode, timestamp, event }. 2) localStorage key 'moi_submissions' stores Submission[]. 3) localStorage key 'moi_tx_counter' stores next counter integer. 4) Navbar + Footer wrap every page. 5) slate-900 background, violet-600 primary CTA, emerald-600 secondary CTA. 6) Path alias @/ points to project root. 7) .gitignore currently only excludes node_modules.",
+  "relevant_files": [
+    "app/pay/page.tsx",
+    "app/bride/page.tsx",
+    "app/groom/page.tsx",
+    "app/ledger/page.tsx",
+    "app/layout.tsx",
+    "components/Navbar.tsx",
+    "components/ReceiptModal.tsx",
+    "package.json",
+    "tsconfig.json",
+    "next.config.js",
+    ".eslintrc.json",
+    ".gitignore"
+  ],
+  "directory_structure": "root: config files (package.json, tsconfig.json, next.config.js, tailwind.config.ts, postcss.config.js). app/: Next.js App Router pages (layout.tsx, page.tsx, pay/, bride/, groom/, ledger/). components/: Navbar.tsx, Footer.tsx, ReceiptModal.tsx. No lib/, no middleware.ts, no .github/ yet. .git/ present (single commit on master branch)."
+}

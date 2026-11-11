@@ -1,0 +1,7 @@
+{
+  "task_id": "task-aws-github-integration",
+  "task_description": "Add AWS cloud services integration (DynamoDB, S3, SES, Cognito-style auth) and GitHub Actions CI/CD to the existing LumaPath Next.js 14 app. Includes AWS SDK libs, API routes, auth middleware, login page, frontend wiring, env example, documentation, and updated .gitignore.",
+  "status": "pending",
+  "feature_order": ["FEAT-001", "FEAT-002", "FEAT-003", "FEAT-004"],
+  "blocked_reason": null
+}

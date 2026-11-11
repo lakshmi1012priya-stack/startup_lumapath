@@ -15,37 +15,49 @@ const FEATURES = [
     icon: '📲',
     title: 'UPI QR Payments',
     desc: 'Instant UPI QR code generation per event. Guests scan and pay in seconds — no cash handling required.',
-    color: 'violet',
+    iconBg: 'bg-violet-500/15',
+    titleHover: 'group-hover:text-violet-400',
+    borderHover: 'hover:border-violet-500',
   },
   {
     icon: '📊',
     title: 'Real-time Ledger',
     desc: 'Every transaction logged instantly. Full A–Z searchable master ledger with zero latency.',
-    color: 'emerald',
+    iconBg: 'bg-emerald-500/15',
+    titleHover: 'group-hover:text-emerald-400',
+    borderHover: 'hover:border-emerald-500',
   },
   {
     icon: '🧾',
     title: 'Dual Receipts',
     desc: 'Serverless receipt generation in PNG and CSV. Guest copy + host archive, every time.',
-    color: 'violet',
+    iconBg: 'bg-violet-500/15',
+    titleHover: 'group-hover:text-violet-400',
+    borderHover: 'hover:border-violet-500',
   },
   {
     icon: '👰🤵',
     title: 'Split Host Dashboards',
     desc: 'Dedicated real-time dashboards for Bride and Groom with clean gift separation and analytics.',
-    color: 'emerald',
+    iconBg: 'bg-emerald-500/15',
+    titleHover: 'group-hover:text-emerald-400',
+    borderHover: 'hover:border-emerald-500',
   },
   {
     icon: '📥',
     title: 'CSV Export',
     desc: 'One-click export of full master ledger for accounting, family records, or CA filing.',
-    color: 'violet',
+    iconBg: 'bg-violet-500/15',
+    titleHover: 'group-hover:text-violet-400',
+    borderHover: 'hover:border-violet-500',
   },
   {
     icon: '📡',
     title: 'Offline Resilience',
     desc: 'localStorage fallback ensures no entry is ever lost, even during network interruptions.',
-    color: 'emerald',
+    iconBg: 'bg-emerald-500/15',
+    titleHover: 'group-hover:text-emerald-400',
+    borderHover: 'hover:border-emerald-500',
   },
 ];
 
@@ -114,7 +126,7 @@ const DEMO_MODULES = [
     title: 'QR Payment Portal',
     desc: 'Guest submits Moi amount via UPI, Cash, or Card. Instant receipt generated.',
     badge: 'Guest-Facing',
-    badgeColor: 'emerald',
+    badgeClass: 'text-emerald-400',
   },
   {
     href: '/bride',
@@ -122,7 +134,7 @@ const DEMO_MODULES = [
     title: "Bride's Gift Hub",
     desc: "Priya's real-time dashboard — all gifts allocated to bride, with live totals.",
     badge: 'Bride Dashboard',
-    badgeColor: 'violet',
+    badgeClass: 'text-violet-400',
   },
   {
     href: '/groom',
@@ -130,7 +142,7 @@ const DEMO_MODULES = [
     title: "Groom's Gift Hub",
     desc: "Suresh's real-time dashboard — gifts allocated to groom, live analytics.",
     badge: 'Groom Dashboard',
-    badgeColor: 'violet',
+    badgeClass: 'text-violet-400',
   },
   {
     href: '/ledger',
@@ -138,7 +150,7 @@ const DEMO_MODULES = [
     title: 'Master Ledger',
     desc: 'Unified financial archive — search, filter, and export full transaction history.',
     badge: 'Admin',
-    badgeColor: 'slate',
+    badgeClass: 'text-slate-400',
   },
 ];
 
@@ -279,14 +291,12 @@ export default function HomePage() {
             {FEATURES.map((f) => (
               <div
                 key={f.title}
-                className={`bg-slate-800 rounded-xl p-6 border border-slate-700 hover:border-${f.color}-500 transition-all shadow-lg group cursor-default`}
+                className={`bg-slate-800 rounded-xl p-6 border border-slate-700 ${f.borderHover} transition-all shadow-lg group cursor-default`}
               >
-                <div className={`text-3xl mb-4 w-12 h-12 rounded-xl flex items-center justify-center ${
-                  f.color === 'violet' ? 'bg-violet-500/15' : 'bg-emerald-500/15'
-                }`}>
+                <div className={`text-3xl mb-4 w-12 h-12 rounded-xl flex items-center justify-center ${f.iconBg}`}>
                   {f.icon}
                 </div>
-                <h3 className={`text-white font-bold text-lg mb-2 group-hover:text-${f.color}-400 transition-colors`}>{f.title}</h3>
+                <h3 className={`text-white font-bold text-lg mb-2 ${f.titleHover} transition-colors`}>{f.title}</h3>
                 <p className="text-slate-400 text-sm leading-relaxed">{f.desc}</p>
               </div>
             ))}
@@ -315,9 +325,7 @@ export default function HomePage() {
                 className="group bg-slate-800 rounded-xl border border-slate-700 hover:border-violet-500 p-6 transition-all shadow-lg hover:shadow-violet-900/30 flex flex-col"
               >
                 <div className="text-4xl mb-4">{m.icon}</div>
-                <span className={`text-xs font-semibold uppercase tracking-wider mb-2 ${
-                  m.badgeColor === 'emerald' ? 'text-emerald-400' : m.badgeColor === 'violet' ? 'text-violet-400' : 'text-slate-400'
-                }`}>{m.badge}</span>
+                <span className={`text-xs font-semibold uppercase tracking-wider mb-2 ${m.badgeClass}`}>{m.badge}</span>
                 <h3 className="text-white font-bold text-base mb-2 group-hover:text-violet-400 transition-colors">{m.title}</h3>
                 <p className="text-slate-400 text-sm leading-relaxed flex-1">{m.desc}</p>
                 <div className="mt-4 text-violet-400 text-sm font-semibold flex items-center gap-1 group-hover:gap-2 transition-all">
